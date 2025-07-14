@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DurBiraz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="main-wrapper reg-main">
+        <!-- Sol kısım: Başlık ve açıklama -->
+        <div class="name">
+            <h1>DurBiraz’a Katıl</h1>
+            <p>"Adını hatırlamasak da, hislerini önemsiyoruz. Hazırsan başlayalım."</p>
+            <div class="duygu-fade-box">
+                <svg class="blob-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#A0E7E5"
+                        d="M43.3,-70.2C55.2,-63.1,64.7,-55.1,70.8,-44.7C76.8,-34.3,79.5,-21.4,78.8,-9.2C78.2,3.1,74.2,14.5,70.2,26.1C66.1,37.7,61.9,49.4,53.5,58.4C45.1,67.3,32.5,73.5,19.5,75.2C6.6,77,-7.8,74.4,-19.9,68.3C-32.1,62.2,-42.1,52.6,-53.5,43.5C-65,34.3,-77.9,25.7,-83.3,13.4C-88.6,1.2,-86.5,-14.8,-79.2,-28.5C-71.9,-42.3,-59.4,-53.9,-45.6,-60.7C-31.7,-67.6,-15.8,-69.6,-1.2,-67.4C13.3,-65.1,26.7,-58.7,43.3,-70.2Z"
+                        transform="translate(100 100)" />
+                </svg>
+                <p id="duyguMesaji">Bugün nasılsın? 💬</p>
+            </div>
+        </div>
+
+        <!-- Sağ kısım: Form -->
+        <div class="form-container shadow">
+            <form>
+                <h3>Başlamak Bitirmenin Yarısıdır..</h3>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Sana nasıl hitap etmemizi istersin?</label>
+                    <input type="name" class="form-control" id="name" placeholder="Anonim123213">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email adresi</label>
+                    <input type="email" class="form-control" id="email" placeholder="ornek@mail.com">
+                    <div id="emailHelp" class="form-text">E-postanızı asla başkalarıyla paylaşmayacağız.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Şifre</label>
+                    <input type="password" class="form-control" id="password" placeholder="Şifreniz">
+                </div>
+                <div class="mb-3">
+                    <label for="date" class="form-label">Tarih</label>
+                    <input type="date" class="form-control" id="date">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="check1">
+                    <label class="form-check-label" for="check1">Beni hatırla</label>
+                </div>
+
+                <button type="submit" class="btn submit-btn">Kayıt Ol</button>
+
+                <!-- Bilgilendirme -->
+                <div class="info-box">
+                    <p>
+                        Kaydol düğmesine tıklayarak, <a href="#">Koşullarımızı</a>,
+                        <a href="#">Gizlilik İlkemizi</a> ve
+                        <a href="#">Çerez Politikamızı</a> kabul etmiş olursun.
+                        <a href="#">Daha fazla bilgi al</a>.
+                    </p>
+                    <p>
+                        Bizden <strong>SMS veya e-posta bildirimleri</strong> alabilirsin ve bu bildirimleri istediğin
+                        zaman durdurabilirsin.
+                    </p>
+                </div>
+            </form>
+            
+        </div>
+        
+    </div>
+
+<script>
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const date = document.getElementById("date").value;
+
+        const response = await fetch("/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, email, password, date }),
+        });
+
+        const message = await response.text();
+        alert(message);
+
+        if (response.ok) {
+            // ✅ login.html sayfasına yönlendir
+            window.location.href = "/login.html";
+        }
+    });
+</script>
+
+
+
+    <script>
+        const mesajlar = [
+            "😊 Bugün mutlu musun?",
+            "😴 Biraz yorgun gibisin...",
+            "🤔 Aklında bir şey mi var?",
+            "💛 DurBiraz, sadece kendin ol.",
+            "🧘 Nefes al... Her şey yoluna girebilir.",
+            "🤩 Heyecanını paylaş!",
+            "😢 Üzgünsen bile buradasın, bu değerli.",
+            "🌱 Kendine zaman vermek iyidir."
+        ];
+
+        const mesajP = document.getElementById("duyguMesaji");
+
+        let index = 0;
+
+        setInterval(() => {
+            mesajP.style.opacity = 0;
+            setTimeout(() => {
+                index = (index + 1) % mesajlar.length;
+                mesajP.textContent = mesajlar[index];
+                mesajP.style.opacity = 1;
+            }, 500);
+        }, 5000);
+    </script>
+
+
+</body>
+
+</html>

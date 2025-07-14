@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>DurBiraz - Keşfet</title>
+     <link href="content.css" rel="stylesheet">
+    
+</head>
+
+<body>
+    <div class="explore-title">🧭 Keşfet</div>
+    <button class="btn logout" onclick="logout()">Çıkış Yap</button>
+
+    <h1 id="welcome">DurBiraz’a Hoş Geldin</h1>
+
+    <div class="container">
+        <div id="postsContainer"></div>
+    </div>
+
+    <div class="input-area">
+        <textarea id="messageInput" rows="2" placeholder="Bugün ne hissediyorsun?"></textarea>
+        <input type="file" id="photoInput" accept="image/*" style="display: none;" />
+        <button class="btn file-btn" onclick="document.getElementById('photoInput').click()">📷 Fotoğraf Ekle</button>
+        <span id="fileName" class="file-name">Dosya seçilmedi</span>
+
+        <button class="btn" onclick="submitMessage()">Yayınla</button>
+    </div>
+
+
+    <script>
+        const name = localStorage.getItem("userName") || "Anonim";
+        const feeling = localStorage.getItem("userFeeling") || "🙂";
+
+        document.getElementById("welcome").innerText = `DurBiraz’a Hoş Geldin, ${name}`;
+
+        function logout() {
+            localStorage.removeItem("userName");
+            window.location.href = "/login.html";
+        }
+
+        function submitMessage() {
+            const input = document.getElementById("messageInput");
+            const fileInput = document.getElementById("photoInput");
+            const message = input.value.trim();
+            const photo = fileInput.files[0];
+
+            if (!message && !photo) return alert("Lütfen bir mesaj veya fotoğraf ekleyin.");
+
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("feeling", feeling);
+            formData.append("message", message);
+            if (photo) {
+                formData.append("photo", photo);
+            }
+
+            fetch("/messages", {
+                method: "POST",
+                body: formData,
+            })
+                .then(res => res.text())
+                .then(() => {
+                    input.value = "";
+                    fileInput.value = "";
+                    fetchMessages();
+                });
+        }
+
+
+        function getFeelingIcon(feeling) {
+            switch (feeling) {
+                case "mutlu": return "😊";
+                case "üzgün": return "😢";
+                case "kızgın": return "😠";
+                case "yorgun": return "😴";
+                case "heyecanlı": return "😄";
+                default: return "🙂";
+            }
+        }
+
+        function addPost(username, message, feeling, date, photo) {
+            const postsContainer = document.getElementById("postsContainer");
+
+            const card = document.createElement("div");
+            card.className = "post-card";
+
+            let photoHTML = "";
+            if (photo) {
+                photoHTML = `<img src="${photo}" alt="Gönderi görseli" style="width:100%; max-height:300px; object-fit:cover; margin-top:10px;" />`;
+            }
+
+            card.innerHTML = `
+        <div class="post-header">
+            <span>${getFeelingIcon(feeling)} ${feeling}</span>
+            <span>@${username}</span>
+        </div>
+        <div class="post-message">${message}</div>
+        ${photoHTML}
+        <div class="post-footer">${date}</div>
+    `;
+
+            postsContainer.prepend(card);
+        }
+
+
+
+
+        function fetchMessages() {
+            fetch("/messages")
+                .then(res => res.json())
+                .then(messages => {
+                    const container = document.getElementById("postsContainer");
+                    container.innerHTML = "";
+                    messages.forEach(msg => {
+                        addPost(msg.name, msg.message, msg.feeling, msg.date, msg.photo);
+                    });
+
+
+                });
+        }
+
+        window.addEventListener("load", () => {
+            fetchMessages(); // İlk yüklemede getir
+            setInterval(fetchMessages, 1000); // 5 saniyede bir güncelle
+        });
+    </script>
+</body>
+
+</html>
